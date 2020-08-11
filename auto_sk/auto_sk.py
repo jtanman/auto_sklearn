@@ -60,12 +60,6 @@ def run():
         needs_threshold=False,
     )
 
-    mean_squared_error = make_scorer('mean_squared_error',
-                                 sklearn.metrics.mean_squared_error,
-                                 optimum=0,
-                                 worst_possible_result=MAXINT,
-                                 greater_is_better=False)
-
     automl = autosklearn.regression.AutoSklearnRegressor(
         time_left_for_this_task=10*60,
         per_run_time_limit=5*60,
