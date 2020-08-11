@@ -55,7 +55,6 @@ def run():
         name="mse_weighted",
         score_func=rmse_weighted,
         optimum=0,
-        worst_possible_result=MAXINT,
         greater_is_better=False,
         needs_proba=False,
         needs_threshold=False,
