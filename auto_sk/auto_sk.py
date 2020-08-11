@@ -18,18 +18,18 @@ def mse_weighted(y, yhat):
 
 def rmse_weighted(y, yhat):
     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
-    sum = 0
-    for i in range(len(y)):
-        y_temp = y[i]
-        yhat_temp = yhat[i]
-        if y > yhat:
-            sum += 2 * ((y_temp - yhat_temp) ** 2)
-        else:
-            sum += (y_temp - yhat_temp) ** 2
+    # sum = 0
+    # for i in range(len(y)):
+    #     y_temp = y[i]
+    #     yhat_temp = yhat[i]
+    #     if y_temp > yhat_temp:
+    #         sum += 2 * ((y_temp - yhat_temp) ** 2)
+    #     else:
+    #         sum += (y_temp - yhat_temp) ** 2
     
-    return np.sqrt(sum / len(y))
-    # err = np.sqrt(np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2)))
-    # return err
+    # return np.sqrt(sum / len(y))
+    err = np.sqrt(np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2)))
+    return err
 
 
 def run():
@@ -65,7 +65,8 @@ def run():
         include_preprocessors=['no_preprocessing',],
         tmp_folder=f'{os.getcwd()}/autosklearn_regression_example_tmp',
         output_folder=f'{os.getcwd()}/autosklearn_regression_example_out',
-        metric=rmse_weighted_scorer,
+        # metric=rmse_weighted_scorer,
+        metric=autosklearn.metrics.mean_squared_error,
     )
 
     automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
