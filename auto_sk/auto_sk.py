@@ -18,8 +18,18 @@ def mse_weighted(y, yhat):
 
 def rmse_weighted(y, yhat):
     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
-    err = np.sqrt(np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2)))
-    return err
+    sum = 0
+    for i in range(len(y)):
+        y_temp = y[i]
+        yhat_temp = yhat[i]
+        if y > yhat:
+            sum += 2 * ((y_temp - yhat_temp) ** 2)
+        else:
+            sum += (y_temp - yhat_temp) ** 2
+    
+    return np.sqrt(sum / len(y))
+    # err = np.sqrt(np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2)))
+    # return err
 
 
 def run():
