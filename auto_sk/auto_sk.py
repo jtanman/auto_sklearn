@@ -16,7 +16,7 @@ def mse_weighted(y, yhat):
     return err
 
 
-def rmse_weighted(y, yhat):
+def rmse_weighted(y_true, y_pred):
     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
     # sum = 0
     # for i in range(len(y)):
@@ -28,10 +28,10 @@ def rmse_weighted(y, yhat):
     #         sum += (y_temp - yhat_temp) ** 2
     
     # return np.sqrt(sum / len(y))
-    sample_weight = np.where(y > yhat, 2, 1)
+    sample_weight = np.where(y_true > y_pred, 2, 1)
     output_errors = np.sqrt(np.average((y_true - y_pred) ** 2, axis=0,
                                weights=sample_weight))
-    return err
+    return output_errors
 
 
 def run():
