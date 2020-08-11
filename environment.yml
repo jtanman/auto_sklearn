@@ -5,15 +5,20 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1
   - abseil-cpp=20200225.2
+  - appdirs=1.4.3
   - arrow-cpp=1.0.0
+  - astroid=2.4.2
+  - attrs=19.3.0
   - aws-sdk-cpp=1.7.164
   - backcall=0.2.0
+  - black=19.10b0
   - boost-cpp=1.72.0
   - brotli=1.0.7
   - bzip2=1.0.8
   - c-ares=1.16.1
-  - ca-certificates=2020.6.20
+  - ca-certificates=2020.6.24
   - certifi=2020.6.20
+  - click=7.1.2
   - curl=7.71.1
   - decorator=4.4.2
   - feather-format=0.4.1
@@ -24,8 +29,10 @@ dependencies:
   - ipdb=0.13.3
   - ipython=7.16.1
   - ipython_genutils=0.2.0
+  - isort=4.3.21
   - jedi=0.17.0
   - krb5=1.17.1
+  - lazy-object-proxy=1.4.3
   - ld_impl_linux-64=2.33.1
   - libblas=3.8.0
   - libcblas=3.8.0
@@ -44,11 +51,14 @@ dependencies:
   - libstdcxx-ng=9.1.0
   - libutf8proc=2.5.0
   - lz4-c=1.9.2
+  - mccabe=0.6.1
+  - mypy_extensions=0.4.3
   - ncurses=6.2
   - numpy=1.19.1
   - openssl=1.1.1g
   - parquet-cpp=1.5.1
   - parso=0.8.0
+  - pathspec=0.7.0
   - pexpect=4.8.0
   - pickleshare=0.7.5
   - pip=20.2.1
@@ -56,26 +66,31 @@ dependencies:
   - ptyprocess=0.6.0
   - pyarrow=1.0.0
   - pygments=2.6.1
+  - pylint=2.5.3
   - python=3.8.3
   - python-dateutil=2.8.1
   - python_abi=3.8
   - pytz=2020.1
   - re2=2020.08.01
   - readline=8.0
+  - regex=2020.7.14
   - setuptools=49.2.1
   - six=1.15.0
   - snappy=1.1.8
   - sqlite=3.32.3
   - thrift-cpp=0.13.0
   - tk=8.6.10
+  - toml=0.10.1
   - traitlets=4.3.3
+  - typed-ast=1.4.1
+  - typing_extensions=3.7.4.2
   - wcwidth=0.2.5
   - wheel=0.34.2
+  - wrapt=1.11.2
   - xz=5.2.5
   - zlib=1.2.11
   - zstd=1.4.5
   - pip:
-    - attrs==19.3.0
     - auto-sklearn==0.8.0
     - configspace==0.4.13
     - cython==0.29.21
@@ -99,5 +114,4 @@ dependencies:
     - scikit-learn==0.22.2.post1
     - scipy==1.5.2
     - smac==0.12.3
-    - toml==0.10.1
 
