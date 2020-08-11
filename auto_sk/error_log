@@ -1,0 +1,96 @@
+(autosk) jtan@DESKTOP-98C9KM1:~/jtan/doordash$ python main.py
+/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/pyparsing.py:3190: FutureWarning: Possible set intersection at position 3
+  self.re = re.compile(self.reString)
+################################################################################
+Use self defined accuracy metric
+[WARNING] [2020-08-11 02:10:56,528:AutoMLSMBO(1)::doordash] Could not find meta-data directory /home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/metalearning/files/mse_weighted_regression_dense
+[WARNING] [2020-08-11 02:40:57,754:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 03:16:34,278:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 03:16:34,278:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 03:17:42,790:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 03:17:42,797:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 03:19:38,396:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 03:19:38,397:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 04:19:42,386:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 04:19:42,387:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 04:20:28,911:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 04:20:28,912:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 04:31:40,410:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[WARNING] [2020-08-11 04:31:40,411:smac.runhistory.runhistory2epm.RunHistory2EPM4LogCost] Got cost of smaller/equal to 0. Replace by 0.000010 since we use log cost.
+[ERROR] [2020-08-11 04:39:35,931:AutoML(1):doordash] [Errno 22] Invalid argument
+Traceback (most recent call last):
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/automl.py", line 485, in fit
+    _proc_smac.run_smbo()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/smbo.py", line 473, in run_smbo
+    smac.optimize()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/facade/smac_ac_facade.py", line 567, in optimize
+    incumbent = self.solver.run()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/optimizer/smbo.py", line 211, in run
+    self.incumbent, inc_perf = self.intensifier.eval_challenger(
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/intensification/intensification.py", line 214, in eval_challenger
+    incumbent = self._race_challenger(challenger=challenger,
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/intensification/intensification.py", line 405, in _race_challenger
+    status, cost, dur, res = self.tae_runner.start(
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/evaluation/__init__.py", line 211, in start
+    return super().start(config=config, instance=instance, cutoff=cutoff,
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/tae/execute_ta_run.py", line 197, in start
+    status, cost, runtime, additional_info = self.run(config=config,
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/evaluation/__init__.py", line 257, in run
+    obj(**obj_kwargs)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/pynisher/limit_function_call.py", line 195, in __call__
+    subproc.start()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/context.py", line 276, in _Popen
+    return Popen(process_obj)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/popen_fork.py", line 70, in _launch
+    self.pid = os.fork()
+OSError: [Errno 22] Invalid argument
+Traceback (most recent call last):
+  File "main.py", line 8, in <module>
+    main()
+  File "main.py", line 4, in main
+    run()
+  File "/home/jtan/jtan/doordash/auto_sk/auto_sk.py", line 61, in run
+    automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/estimators.py", line 809, in fit
+    super().fit(
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/estimators.py", line 373, in fit
+    self._automl[0].fit(**kwargs)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/automl.py", line 1128, in fit
+    return super().fit(
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/automl.py", line 485, in fit
+    _proc_smac.run_smbo()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/smbo.py", line 473, in run_smbo
+    smac.optimize()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/facade/smac_ac_facade.py", line 567, in optimize
+    incumbent = self.solver.run()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/optimizer/smbo.py", line 211, in run
+    self.incumbent, inc_perf = self.intensifier.eval_challenger(
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/intensification/intensification.py", line 214, in eval_challenger
+    incumbent = self._race_challenger(challenger=challenger,
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/intensification/intensification.py", line 405, in _race_challenger
+    status, cost, dur, res = self.tae_runner.start(
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/evaluation/__init__.py", line 211, in start
+    return super().start(config=config, instance=instance, cutoff=cutoff,
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/smac/tae/execute_ta_run.py", line 197, in start
+    status, cost, runtime, additional_info = self.run(config=config,
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/autosklearn/evaluation/__init__.py", line 257, in run
+    obj(**obj_kwargs)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/site-packages/pynisher/limit_function_call.py", line 195, in __call__
+    subproc.start()
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/context.py", line 276, in _Popen
+    return Popen(process_obj)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/home/jtan/anaconda3/envs/autosk/lib/python3.8/multiprocessing/popen_fork.py", line 70, in _launch
+    self.pid = os.fork()
+OSError: [Errno 22] Invalid argument
