@@ -74,8 +74,8 @@ def run():
         include_preprocessors=['no_preprocessing',],
         tmp_folder=f'{os.getcwd()}/autosklearn_regression_example_tmp',
         output_folder=f'{os.getcwd()}/autosklearn_regression_example_out',
-        # metric=rmse_weighted_scorer,
-        metric=autosklearn.metrics.mean_squared_error,
+        metric=rmse_weighted_scorer,
+        # metric=autosklearn.metrics.mean_squared_error,
     )
     import ipdb; ipdb.set_trace()
     automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
