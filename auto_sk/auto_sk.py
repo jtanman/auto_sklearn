@@ -39,7 +39,7 @@ def run():
     data_train_treated = feather.read_dataframe('./data_train_treated.feather')
     data_val_treated = feather.read_dataframe('./data_val_treated.feather')
 
-    # data_train_treated = data_train_treated.sample(n=10000, axis=0)
+    data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
     X_train = data_train_treated.drop('delivery', axis=1)
     y_train = data_train_treated['delivery']
@@ -68,7 +68,7 @@ def run():
         # metric=rmse_weighted_scorer,
         metric=autosklearn.metrics.mean_squared_error,
     )
-
+    import ipdb; ipdb.set_trace()
     automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
 
     with open(f'automl_{time.strftime("%Y%m%d-%H%M%S")}.pickle', 'wb') as f:
