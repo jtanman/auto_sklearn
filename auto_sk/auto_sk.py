@@ -28,7 +28,9 @@ def rmse_weighted(y_true, y_pred):
     #         sum += (y_temp - yhat_temp) ** 2
     
     # return np.sqrt(sum / len(y))
-    sample_weight = np.where(y_true > y_pred, 2, 1)
+    sample_weight = np.ones(len(y_true))
+    sample_weight[y_true > y_pred] = 2
+    # sample_weight = np.where(y_true > y_pred, 2, 1)
     output_errors = np.sqrt(np.average((y_true - y_pred) ** 2, axis=0,
                                weights=sample_weight))
     return output_errors
@@ -52,7 +54,7 @@ def run():
     print("#" * 80)
     print("Use self defined accuracy metric")
     rmse_weighted_scorer = autosklearn.metrics.make_scorer(
-        name="mse_weighted",
+        name="rmse_weighted",
         score_func=rmse_weighted,
         optimum=0,
         greater_is_better=False,
@@ -63,7 +65,7 @@ def run():
     automl = autosklearn.regression.AutoSklearnRegressor(
         time_left_for_this_task=10*60,
         per_run_time_limit=5*60,
-        ml_memory_limit=9216,
+        ml_memory_limit=8192,
         include_preprocessors=['no_preprocessing',],
         tmp_folder=f'{os.getcwd()}/autosklearn_regression_example_tmp',
         output_folder=f'{os.getcwd()}/autosklearn_regression_example_out',
