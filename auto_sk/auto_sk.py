@@ -127,16 +127,16 @@ def run():
         # metric=autosklearn.metrics.mean_squared_error,
     )
     import ipdb; ipdb.set_trace()
-    automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
+    # automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
 
-    with open(f'automl_{time.strftime("%Y%m%d-%H%M%S")}.pickle', 'wb') as f:
-        # Pickle the 'data' dictionary using the highest protocol available.
-        pickle.dump(automl, f, pickle.HIGHEST_PROTOCOL)
+    # with open(f'automl_{time.strftime("%Y%m%d-%H%M%S")}.pickle', 'wb') as f:
+    #     # Pickle the 'data' dictionary using the highest protocol available.
+    #     pickle.dump(automl, f, pickle.HIGHEST_PROTOCOL)
 
-    # with open('automl_20200811-171554.pickle', 'rb') as f:
-    #     # The protocol version used is detected automatically, so we do not
-    #     # have to specify it.
-    #     automl = pickle.load(f)
+    with open('automl_20200812-083152.pickle', 'rb') as f:
+        # The protocol version used is detected automatically, so we do not
+        # have to specify it.
+        automl = pickle.load(f)
 
     import ipdb; ipdb.set_trace()
 
