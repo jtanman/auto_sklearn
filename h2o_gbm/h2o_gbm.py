@@ -24,7 +24,7 @@ from auto_sk.auto_sk import rmse_weighted
 # def evaluate(test, predictions):
 #     predictions["actual"] = test.delivery.values
 #     predictions.columns = ["prediction", "actual"]
-#     test_h2o.delivery.values- predictions.prediction
+#     data_val_treated.delivery.values- predictions.prediction
 #     predictions["sresidual"] = predictions.residual / np.sqrt(predictions.actual)
 #     predictions["fit"] = 0
 #     # if residual is positive there are not enough items in the store
@@ -110,8 +110,8 @@ from auto_sk.auto_sk import rmse_weighted
 #     f = plt.figure(figsize=(30, 10))
 #     ax = f.add_subplot(121)
 #     ax2 = f.add_subplot(122)
-#     ax.scatter(test_h2o.delivery.values, s=10, label='Gaussian', alpha=0.7)
-#     ax.scatter(test_h2o.delivery.values, s=10, label='Custom', alpha=0.7)
+#     ax.scatter(data_val_treated.delivery.values, s=10, label='Gaussian', alpha=0.7)
+#     ax.scatter(data_val_treated.delivery.values, s=10, label='Custom', alpha=0.7)
 #     plt.grid(axis='both')
 #     ax.set_xlabel('Predicted', size=20)
 #     ax.set_ylabel('Actual', size=20)
@@ -195,8 +195,8 @@ def train_custom_gbm():
     # Evalute and print summary
     # items, less, more_or_perfect = evaluate(data_val_treated, predictions)
 
-    print(f'RMSE Weighted: {rmse_weighted(test_h2o.delivery.values, predictions.prediction)}')
-    print(f'Proportion Late: {np.mean(test_h2o.delivery.values > predictions.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.prediction)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.prediction)}')
 
     # print_evaluation(predictions, less, more_or_perfect)
 
@@ -240,8 +240,8 @@ def train_custom_gbm():
     predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
 
     # Evalute and print summary
-    print(f'RMSE Weighted: {rmse_weighted(test_h2o.delivery.values, predictions_custom.prediction)}')
-    print(f'Proportion Late: {np.mean(test_h2o.delivery.values > predictions_custom.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.prediction)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.prediction)}')
     # items_custom, less_custom, more_or_perfect_custom = evaluate(test, predictions_custom)
 
     # print_evaluation(predictions_custom, less_custom, more_or_perfect_custom)
@@ -297,8 +297,8 @@ def train_custom_gbm():
     predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
 
     # Evalute and print summary
-    print(f'RMSE Weighted: {rmse_weighted(test_h2o.delivery.values, predictions_custom_mm.prediction)}')
-    print(f'Proportion Late: {np.mean(test_h2o.delivery.values > predictions_custom_mm.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.prediction)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_mm.prediction)}')
     # items_custom_mm, less_custom_mm, more_or_perfect_custom_mm = evaluate(test, predictions_custom_mm)
 
     # print_evaluation(predictions_custom_mm, less_custom_mm, more_or_perfect_custom_mm)
@@ -321,8 +321,8 @@ def train_custom_gbm():
     predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
 
     # Evalute and print summary
-    print(f'RMSE Weighted: {rmse_weighted(test_h2o.delivery.values, predictions_custom_cmm.prediction)}')
-    print(f'Proportion Late: {np.mean(test_h2o.delivery.values > predictions_custom_cmm.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.prediction)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_cmm.prediction)}')
     # items_custom_cmm, less_custom_cmm, more_or_perfect_custom_cmm = evaluate(test, predictions_custom_cmm)
 
     # print_evaluation(predictions_custom_cmm, less_custom_cmm, more_or_perfect_custom_cmm)
