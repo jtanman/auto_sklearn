@@ -2,23 +2,23 @@ import datetime
 
 import feather
 import h2o
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.utils.distributions import CustomDistributionGaussian
-from matplotlib.dates import DateFormatter
-# Functions to analyse and plot results
-from pandas.plotting import register_matplotlib_converters
 
 from auto_sk.auto_sk import rmse_weighted
 
-register_matplotlib_converters()
+# # Functions to analyse and plot results
+# from pandas.plotting import register_matplotlib_converters
+# from matplotlib.dates import DateFormatter
+# import matplotlib
+# import matplotlib.pyplot as plt
+# register_matplotlib_converters()
 
-plt.style.use('seaborn-deep')
-plt.rcParams['legend.fontsize'] = 'large'
-plt.rcParams['figure.facecolor'] = 'white'
+# plt.style.use('seaborn-deep')
+# plt.rcParams['legend.fontsize'] = 'large'
+# plt.rcParams['figure.facecolor'] = 'white'
 
 # evaluate number of good predictions
 def evaluate(test, predictions):
