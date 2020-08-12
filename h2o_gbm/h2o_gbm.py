@@ -195,8 +195,8 @@ def train_custom_gbm():
     # Evalute and print summary
     # items, less, more_or_perfect = evaluate(data_val_treated, predictions)
 
-    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.prediction)}')
-    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.predict)}')
 
     # print_evaluation(predictions, less, more_or_perfect)
 
