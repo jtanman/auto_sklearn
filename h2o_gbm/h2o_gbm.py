@@ -203,12 +203,13 @@ def train_custom_gbm():
     # Define asymmetric loss distribution from Gaussian distribution
     class AsymmetricLossDistribution(CustomDistributionGaussian):
         def gradient(self, y, f):
-            error = (y - f) ** 2
+            error = (y - f)
+            return error if error < 0 else 2 * error
             # more predicted items is better error than the fewer predicted items
             # if residual is positive there are not enough items in the store
             # if residual is negative or zero there are enough items in the store
             # the positive error should be set as bigger!
-            return error if error < 0 else 2 * error
+            
 
     # upload distribution to h2o
     name = "asymmetric"
