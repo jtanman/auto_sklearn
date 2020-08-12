@@ -12,35 +12,16 @@ import sklearn.model_selection
 from sklearn.metrics._regression import _check_reg_targets
 from sklearn.utils.validation import _num_samples, check_array, check_consistent_length
 
-# def mse_weighted(y, yhat):
-#     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
-#     err = np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2))
-#     return err
+def mse_weighted(y, yhat):
+    # weighted error squaring the error and then doubling it if the actual delivery is late/greater
+    err = np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2))
+    return err
 
 
-# def rmse_weighted(y_true, y_pred):
-#     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
-#     # sum = 0
-#     # for i in range(len(y)):
-#     #     y_temp = y[i]
-#     #     yhat_temp = yhat[i]
-#     #     if y_temp > yhat_temp:
-#     #         sum += 2 * ((y_temp - yhat_temp) ** 2)
-#     #     else:
-#     #         sum += (y_temp - yhat_temp) ** 2
-
-#     # return np.sqrt(sum / len(y))
-#     print(y_true)
-#     print(y_pred)
-#     sample_weight = np.ones(len(y_true))
-#     for i in range(len(y_true)):
-#         if y_true[i] > y_pred[i]:
-#             sample_weight[i] = 2
-#     # sample_weight[y_true > y_pred] = 2
-#     # sample_weight = np.where(y_true > y_pred, 2, 1)
-#     output_errors = np.sqrt(np.average((y_true - y_pred) ** 2, axis=0,
-#                                weights=sample_weight))
-#     return output_errors
+def rmse_weighted(y, y_hat):
+    # weighted error squaring the error and then doubling it if the actual delivery is late/greater
+    err = np.sqrt(np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2)))
+    return err
 
 
 def mean_squared_error_weighted(y_true, y_pred, *, sample_weight=None, multioutput='uniform_average', squared=False):
@@ -152,29 +133,28 @@ def run():
         # Pickle the 'data' dictionary using the highest protocol available.
         pickle.dump(automl, f, pickle.HIGHEST_PROTOCOL)
 
-    print(automl.show_models())
-    print(automl.sprint_statistics())
-
-    import ipdb; ipdb.set_trace()
-
-    # with open('automl_20200811-013151.pickle', 'rb') as f:
+    # with open('automl_20200811-171554.pickle', 'rb') as f:
     #     # The protocol version used is detected automatically, so we do not
     #     # have to specify it.
     #     automl = pickle.load(f)
+
+    import ipdb; ipdb.set_trace()
+
+    print(automl.show_models())
+    print(automl.sprint_statistics())
 
     print(f'RMSE train: {np.sqrt(sklearn.metrics.mean_squared_error(y_train, automl.predict(X_train)))}')
 
     yhat = automl.predict(X_test)
 
     print(f'RMSE: {np.sqrt(sklearn.metrics.mean_squared_error(y_test, yhat))}')
-    print(f'RMSE Weighted: {rmse_weighted(y_test, yhat)}')
+    print(f'RMSE Weighted: {mean_squared_error_weighted(y_test, yhat)}')
+    print(f'RMSE Weighted Old: {rmse_weighted(y_test, yhat)}')
     print(f'MAE: {sklearn.metrics.mean_absolute_error(y_test, yhat)}')
     print(f'r2: {	sklearn.metrics.r2_score(y_test, yhat)}')
 
-    import ipdb; ipdb.set_trace()
-
     data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')
-    pd.DataFrame({'prediction': automl.predict(data_pred_treated)}).to_csv('data_to_predict.csv')
+    pd.DataFrame({'prediction': automl.predict(data_pred_treated)}).to_csv(f'data_to_predict_{time.strftime("%Y%m%d-%H%M%S")}.csv')
 
     import ipdb; ipdb.set_trace()
 
