@@ -120,7 +120,7 @@ from auto_sk.auto_sk import rmse_weighted
 
 #     # residual error
 #     ax2.scatter(predictions.prediction, predictions.sresidual, s=10, label='Gaussian', alpha=0.7)
-#     ax2.scatter(predictions_custom.prediction, predictions_custom.sresidual, s=10, label='Custom', alpha=0.7)
+#     ax2.scatter(predictions_custom.predict, predictions_custom.sresidual, s=10, label='Custom', alpha=0.7)
 #     plt.hlines(y=0, xmin=0, xmax=200, linewidth=2)
 #     plt.grid(axis='both')
 #     ax2.set_xlabel('Prediction', size=20)
@@ -240,16 +240,16 @@ def train_custom_gbm():
     predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
 
     # Evalute and print summary
-    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.prediction)}')
-    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
     # items_custom, less_custom, more_or_perfect_custom = evaluate(test, predictions_custom)
 
     # print_evaluation(predictions_custom, less_custom, more_or_perfect_custom)
 
     print("original vs. custom")
     # print("actual mean:", predictions.actual.mean(), predictions_custom.actual.mean())
-    print("prediction mean:", predictions.prediction.mean(), predictions_custom.prediction.mean())
-    print("prediction variance:", predictions.prediction.var(), predictions_custom.prediction.var())
+    print("prediction mean:", predictions.prediction.mean(), predictions_custom.predict.mean())
+    print("prediction variance:", predictions.prediction.var(), predictions_custom.predict.var())
     print("residual mean:", predictions.sresidual.mean(), predictions_custom.sresidual.mean())
     print("residual variance:", predictions.sresidual.var(), predictions_custom.sresidual.var())
 
@@ -297,8 +297,8 @@ def train_custom_gbm():
     predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
 
     # Evalute and print summary
-    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.prediction)}')
-    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_mm.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_mm.predict)}')
     # items_custom_mm, less_custom_mm, more_or_perfect_custom_mm = evaluate(test, predictions_custom_mm)
 
     # print_evaluation(predictions_custom_mm, less_custom_mm, more_or_perfect_custom_mm)
@@ -321,8 +321,8 @@ def train_custom_gbm():
     predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
 
     # Evalute and print summary
-    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.prediction)}')
-    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_cmm.prediction)}')
+    print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
+    print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_cmm.predict)}')
     # items_custom_cmm, less_custom_cmm, more_or_perfect_custom_cmm = evaluate(test, predictions_custom_cmm)
 
     # print_evaluation(predictions_custom_cmm, less_custom_cmm, more_or_perfect_custom_cmm)
