@@ -20,7 +20,7 @@ def mse_weighted(y, yhat):
 
 def rmse_weighted(y, y_hat):
     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
-    err = np.sqrt(np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2)))
+    err = np.sqrt(np.mean(np.where(y > y_hat, 2 * ((y - y_hat) ** 2), (y - y_hat) ** 2)))
     return err
 
 
@@ -133,7 +133,7 @@ def run():
     #     # Pickle the 'data' dictionary using the highest protocol available.
     #     pickle.dump(automl, f, pickle.HIGHEST_PROTOCOL)
 
-    with open('automl_20200812-083152.pickle', 'rb') as f:
+    with open('automl_20200812-183241.pickle', 'rb') as f:
         # The protocol version used is detected automatically, so we do not
         # have to specify it.
         automl = pickle.load(f)
@@ -143,7 +143,7 @@ def run():
     print(automl.show_models())
     print(automl.sprint_statistics())
 
-    print(f'RMSE train: {np.sqrt(sklearn.metrics.mean_squared_error(y_train, automl.predict(X_train)))}')
+    # print(f'RMSE train: {np.sqrt(sklearn.metrics.mean_squared_error(y_train, automl.predict(X_train)))}')
 
     yhat = automl.predict(X_test)
 
