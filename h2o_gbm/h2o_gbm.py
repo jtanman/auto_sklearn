@@ -75,8 +75,8 @@ print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predicti
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
 
 print("original vs. custom")
-print("prediction mean:", predictions.prediction.mean(), predictions_custom.predict.mean())
-print("prediction variance:", predictions.prediction.var(), predictions_custom.predict.var())
+print("prediction mean:", predictions.predict.mean(), predictions_custom.predict.mean())
+print("prediction variance:", predictions.predict.var(), predictions_custom.predict.var())
 print("residual mean:", predictions.sresidual.mean(), predictions_custom.sresidual.mean())
 print("residual variance:", predictions.sresidual.var(), predictions_custom.sresidual.var())
 
