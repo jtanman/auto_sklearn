@@ -12,6 +12,27 @@ from auto_sk.auto_sk import rmse_weighted
 
 h2o.init()
 
+# evaluate number of good predictions
+def evaluate(test, predictions):
+
+    import ipdb; ipdb.set_trace()
+    predictions["actual"] = test.delivery.values
+    predictions.columns = ["prediction", "actual"]
+    predictions["date"] = test.date.values
+    predictions["item"] = test.item.values
+    predictions["store"] = test.store.values
+    predictions["residual"] = predictions.actual - predictions.prediction
+    predictions["sresidual"] = predictions.residual / np.sqrt(predictions.actual)
+    predictions["fit"] = 0
+    # if residual is positive there are not enough items in the store
+    predictions.loc[predictions.residual > 0, "fit"] = 0
+    # if residual is zero or negative there are enough or more items in the store
+    predictions.loc[predictions.residual <= 0, "fit"] = 1
+    items = predictions.shape[0]
+    more_or_perfect = sum(predictions.fit)
+    less = items - more_or_perfect
+    return (items, less, more_or_perfect)
+
 data_train_treated = feather.read_dataframe('./data_train_treated.feather')
 data_val_treated = feather.read_dataframe('./data_val_treated.feather')
 
@@ -31,6 +52,10 @@ gbm_gaussian.train(y="delivery", x=ind_vars, training_frame=train_h2o)
 
 # Predict
 predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
+
+import ipdb; ipdb.set_trace()
+
+items, less, more_or_perfect = evaluate(test, predictions)
 
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.predict)}')
