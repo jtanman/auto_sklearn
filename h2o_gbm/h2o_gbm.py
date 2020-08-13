@@ -36,7 +36,7 @@ data_train_treated = feather.read_dataframe('./data_train_treated.feather')
 data_val_treated = feather.read_dataframe('./data_val_treated.feather')
 data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')
 
-data_train_treated = data_train_treated.sample(n=10000, axis=0)
+# data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
 ind_vars = list(data_train_treated.columns)
 ind_vars.remove('delivery')
@@ -168,7 +168,7 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func
 # Train GBM model with custom metric and distribution
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
-    ntrees=50,
+    ntrees=20000,
     max_depth=3,
     score_each_iteration=True,
     stopping_metric="custom",
@@ -182,7 +182,7 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
 gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
 model_path = h2o.save_model(gbm_custom_cmm, force=True)
-os.rename(model_path, model_path+time.strftime("%Y%m%d-%H%M%S"))
+os.rename(model_path, model_path + '_' + time.strftime("%Y%m%d-%H%M%S"))
 
 # Predict
 predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
@@ -194,5 +194,5 @@ print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predicti
 
 predictions_pred = gbm_custom_cmm.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
-    f'data_to_predict_h20{time.strftime("%Y%m%d-%H%M%S")}.csv'
+    f'data_to_predict_h20_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )
