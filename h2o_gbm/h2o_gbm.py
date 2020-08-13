@@ -150,10 +150,6 @@ gbm_custom_mm = H2OGradientBoostingEstimator(
     distribution="gaussian",
     custom_metric_func=custom_mm_func,
 )
-
-import ipdb
-
-ipdb.set_trace()
 gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
 # Predict
@@ -164,6 +160,7 @@ deliveries, late, early = evaluate(data_val_treated, predictions_custom_mm)
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
+import ipdb; ipdb.set_trace()
 # Train GBM model with custom metric and distribution
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
