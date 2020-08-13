@@ -35,7 +35,7 @@ data_train_treated = feather.read_dataframe('./data_train_treated.feather')
 data_val_treated = feather.read_dataframe('./data_val_treated.feather')
 data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')
 
-# data_train_treated = data_train_treated.sample(n=10000, axis=0)
+data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
 ind_vars = list(data_train_treated.columns)
 ind_vars.remove('delivery')
@@ -180,7 +180,8 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
 )
 gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
-h2o.save_model(gbm_custom_cmm, force=True)
+model_path = h2o.save_model(gbm_custom_cmm, force=True)
+os.rename(model_path, model_path+time.strftime("%Y%m%d-%H%M%S"))
 
 # Predict
 predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()

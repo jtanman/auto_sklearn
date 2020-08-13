@@ -98,7 +98,7 @@ def run():
     data_train_treated = feather.read_dataframe('./data_train_treated.feather')
     data_val_treated = feather.read_dataframe('./data_val_treated.feather')
 
-    # data_train_treated = data_train_treated.sample(n=10000, axis=0)
+    data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
     X_train = data_train_treated.drop('delivery', axis=1)
     y_train = data_train_treated['delivery']
