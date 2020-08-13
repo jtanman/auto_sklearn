@@ -12,6 +12,7 @@ import sklearn.model_selection
 from sklearn.metrics._regression import _check_reg_targets
 from sklearn.utils.validation import _num_samples, check_array, check_consistent_length
 
+
 def mse_weighted(y, yhat):
     # weighted error squaring the error and then doubling it if the actual delivery is late/greater
     err = np.mean(np.where(y > yhat, 2 * ((y - yhat) ** 2), (y - yhat) ** 2))
@@ -117,8 +118,8 @@ def run():
     )
 
     automl = autosklearn.regression.AutoSklearnRegressor(
-        time_left_for_this_task=10 * 60,
-        per_run_time_limit=5 * 60,
+        time_left_for_this_task=8 * 60 * 60,
+        per_run_time_limit=60 * 60,
         ml_memory_limit=8192,
         include_preprocessors=['no_preprocessing',],
         tmp_folder=f'{os.getcwd()}/autosklearn_regression_example_tmp',
@@ -126,7 +127,7 @@ def run():
         metric=rmse_weighted_scorer,
         # metric=autosklearn.metrics.mean_squared_error,
     )
-    import ipdb; ipdb.set_trace()
+
     automl.fit(X_train, y_train, X_test=X_test, y_test=y_test, dataset_name='doordash')
 
     with open(f'automl_{time.strftime("%Y%m%d-%H%M%S")}.pickle', 'wb') as f:
@@ -137,8 +138,6 @@ def run():
     #     # The protocol version used is detected automatically, so we do not
     #     # have to specify it.
     #     automl = pickle.load(f)
-
-    import ipdb; ipdb.set_trace()
 
     print(automl.show_models())
     print(automl.sprint_statistics())
@@ -154,8 +153,8 @@ def run():
     print(f'r2: {	sklearn.metrics.r2_score(y_test, yhat)}')
 
     data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')
-    pd.DataFrame({'prediction': automl.predict(data_pred_treated)}).to_csv(f'data_to_predict_{time.strftime("%Y%m%d-%H%M%S")}.csv')
-
-    import ipdb; ipdb.set_trace()
+    pd.DataFrame({'prediction': automl.predict(data_pred_treated)}).to_csv(
+        f'data_to_predict_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+    )
 
     return automl
