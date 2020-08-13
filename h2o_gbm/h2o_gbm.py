@@ -26,7 +26,7 @@ def evaluate(test, predictions):
     predictions.loc[predictions.residual <= 0, "fit"] = 1
     deliveries = predictions.shape[0]
     early = sum(predictions.fit)
-    late = items - more_or_perfect
+    late = deliveries - early
     return (deliveries, late, early)
 
 data_train_treated = feather.read_dataframe('./data_train_treated.feather')
