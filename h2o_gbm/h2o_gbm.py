@@ -120,20 +120,28 @@ def train_custom_gbm():
                                             func_file="mm_rmse.py")
 
     # Train GBM model with custom metric
-    gbm_custom_mm = H2OGradientBoostingEstimator(
-        model_id="custom_delivery_model_mm",
-        ntrees=50,
-        max_depth=5,
-        score_each_iteration=True,
-        stopping_metric="custom",
-        stopping_tolerance=0.1,
-        stopping_rounds=5,
-        distribution="gaussian",
-        custom_metric_func=custom_mm_func,
-    )
+    # gbm_custom_mm = H2OGradientBoostingEstimator(
+    #     model_id="custom_delivery_model_mm",
+    #     ntrees=50,
+    #     max_depth=5,
+    #     score_each_iteration=True,
+    #     stopping_metric="custom",
+    #     stopping_tolerance=0.1,
+    #     stopping_rounds=5,
+    #     distribution="gaussian",
+    #     custom_metric_func=custom_mm_func,
+    # )
+
+    gbm_custom_mm = H2OGradientBoostingEstimator(ntrees=3,
+                                     max_depth=5,
+                                     score_each_iteration=True,
+                                     custom_metric_func=custom_mm_func,
+                                     stopping_metric="custom",
+                                     stopping_tolerance=0.1,
+                                     stopping_rounds=3)
 
     import ipdb; ipdb.set_trace()
-    gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o)
+    gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
     # Predict
     predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
