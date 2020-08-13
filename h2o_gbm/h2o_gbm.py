@@ -35,50 +35,50 @@ predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.predict)}')
 
-# # Define asymmetric loss distribution from Gaussian distribution
-# class AsymmetricLossDistribution(CustomDistributionGaussian):
-#     def gradient(self, y, f):
-#         error = y - f
-#         return error if error < 0 else 2 * error
+# Define asymmetric loss distribution from Gaussian distribution
+class AsymmetricLossDistribution(CustomDistributionGaussian):
+    def gradient(self, y, f):
+        error = y - f
+        return error if error < 0 else 2 * error
 
-# # upload distribution to h2o
-# name = "asymmetric"
-# try:
-#     distribution_ref = h2o.upload_custom_distribution(
-#         AsymmetricLossDistribution, func_name="custom_" + name, func_file="custom_" + name + ".py"
-#     )
-# except (IOError):
-#     print("This error occur in python 2.7 due to inspect package bug.")
-#     print(
-#         "You can solve this problem by saving custom distribution class to a file with .py extension and loaded it to IPython separately."
-#     )
-#     import sys
+# upload distribution to h2o
+name = "asymmetric"
+try:
+    distribution_ref = h2o.upload_custom_distribution(
+        AsymmetricLossDistribution, func_name="custom_" + name, func_file="custom_" + name + ".py"
+    )
+except (IOError):
+    print("This error occur in python 2.7 due to inspect package bug.")
+    print(
+        "You can solve this problem by saving custom distribution class to a file with .py extension and loaded it to IPython separately."
+    )
+    import sys
 
-#     sys.exit()
+    sys.exit()
 
-# gbm_custom = H2OGradientBoostingEstimator(
-#     model_id="custom_delivery_model",
-#     ntrees=50,
-#     max_depth=5,
-#     score_each_iteration=True,
-#     distribution="custom",
-#     custom_distribution_func=distribution_ref,
-# )
+gbm_custom = H2OGradientBoostingEstimator(
+    model_id="custom_delivery_model",
+    ntrees=50,
+    max_depth=5,
+    score_each_iteration=True,
+    distribution="custom",
+    custom_distribution_func=distribution_ref,
+)
 
-# gbm_custom.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
+gbm_custom.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
 
-# # Predict
-# predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
+# Predict
+predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
 
-# # Evalute and print summary
-# print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
-# print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
+# Evalute and print summary
+print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
+print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
 
-# print("original vs. custom")
-# print("prediction mean:", predictions.prediction.mean(), predictions_custom.predict.mean())
-# print("prediction variance:", predictions.prediction.var(), predictions_custom.predict.var())
-# print("residual mean:", predictions.sresidual.mean(), predictions_custom.sresidual.mean())
-# print("residual variance:", predictions.sresidual.var(), predictions_custom.sresidual.var())
+print("original vs. custom")
+print("prediction mean:", predictions.prediction.mean(), predictions_custom.predict.mean())
+print("prediction variance:", predictions.prediction.var(), predictions_custom.predict.var())
+print("residual mean:", predictions.sresidual.mean(), predictions_custom.sresidual.mean())
+print("residual variance:", predictions.sresidual.var(), predictions_custom.sresidual.var())
 
 # Custom asymmetric metric
 
