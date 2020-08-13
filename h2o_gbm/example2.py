@@ -19,6 +19,17 @@ airlines['FlightNum'] = airlines['FlightNum'].asfactor()
 predictors = ["Origin", "Dest", "Year", "UniqueCarrier", "DayOfWeek", "Month", "Distance", "FlightNum"]
 response = "IsDepDelayed"
 
+data_train_treated = feather.read_dataframe('./data_train_treated.feather')
+data_val_treated = feather.read_dataframe('./data_val_treated.feather')
+
+data_train_treated = data_train_treated.sample(n=10000, axis=0)
+
+ind_vars = list(data_train_treated.columns)
+ind_vars.remove('delivery')
+
+train_h2o = h2o.H2OFrame(data_train_treated)
+test_h2o = h2o.H2OFrame(data_val_treated)
+
 # split into train and validation sets
 train, valid= airlines.split_frame(ratios = [.8], seed = 1234)
 
@@ -68,6 +79,6 @@ model = H2OGradientBoostingEstimator(ntrees=3,
                                      stopping_metric="custom",
                                      stopping_tolerance=0.1,
                                      stopping_rounds=3)
-model.train(x=predictors, y=response, training_frame=train, validation_frame = valid)
+model.train(x=ind_vars, y='delivery', training_frame=train_h2o, validation_frame = test_h2o)
 
 import ipdb; ipdb.set_trace()
