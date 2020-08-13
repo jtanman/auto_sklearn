@@ -172,12 +172,12 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
     max_depth=3,
     score_each_iteration=True,
     stopping_metric="custom",
-    stopping_tolerance=0.1,
-    stopping_rounds=10,
+    # stopping_tolerance=0.1,
+    # stopping_rounds=10,
     distribution="custom",
     custom_metric_func=custom_mm_func,
     custom_distribution_func=distribution_ref,
-    max_runtime_secs=30 * 60 * 60,
+    max_runtime_secs=30 * 60,
 )
 gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
