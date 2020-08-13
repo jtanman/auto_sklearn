@@ -102,7 +102,7 @@ print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions
 class CustomRmseFunc:
     def map(self, pred, act, w, o, model):
         error = act[0] - pred[0]
-        error = error if error > 0 else 2 * error
+        error = error if error < 0 else 2 * error
         return [error * error, 1]
 
     def reduce(self, l, r):
@@ -131,14 +131,13 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func
 #     custom_metric_func=custom_mm_func,
 # )
 
-gbm_custom_mm = H2OGradientBoostingEstimator(
-    ntrees=3,
+gbm_gaussian = H2OGradientBoostingEstimator(
+    model_id="delivery_model",
+    ntrees=50,
     max_depth=5,
     score_each_iteration=True,
+    distribution="gaussian",
     custom_metric_func=custom_mm_func,
-    stopping_metric="custom",
-    stopping_tolerance=0.1,
-    stopping_rounds=3,
 )
 
 import ipdb
