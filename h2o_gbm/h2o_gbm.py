@@ -19,6 +19,9 @@ def train_custom_gbm():
 
     data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
+    ind_vars = list(data_train_treated.columns)
+    ind_vars.remove('delivery')
+
     train_h2o = h2o.H2OFrame(data_train_treated)
     test_h2o = h2o.H2OFrame(data_val_treated)
 
@@ -26,7 +29,7 @@ def train_custom_gbm():
         model_id="delivery_model", ntrees=50, max_depth=5, score_each_iteration=True, distribution="gaussian"
     )
 
-    gbm_gaussian.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
+    gbm_gaussian.train(y="delivery", x=ind_vars, training_frame=train_h2o)
 
     # Predict
     predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
@@ -111,7 +114,7 @@ def train_custom_gbm():
     )
 
     import ipdb; ipdb.set_trace()
-    gbm_custom_mm.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
+    gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o)
 
     # Predict
     predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
