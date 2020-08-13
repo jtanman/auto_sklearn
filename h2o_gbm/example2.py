@@ -36,6 +36,8 @@ airlines_gbm.train(x = predictors, y = response, training_frame = train, validat
 # print the auc for the validation data
 airlines_gbm.auc(valid=True)
 
+import ipdb; ipdb.set_trace()
+
 # Use a custom metric
 # Create a custom RMSE Model metric and save as mm_rmse.py
 # Note that this references a java class java.lang.Math
@@ -67,3 +69,5 @@ model = H2OGradientBoostingEstimator(ntrees=3,
                                      stopping_tolerance=0.1,
                                      stopping_rounds=3)
 model.train(x=predictors, y=response, training_frame=train, validation_frame = valid)
+
+import ipdb; ipdb.set_trace()

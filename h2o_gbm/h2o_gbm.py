@@ -91,6 +91,7 @@ def train_custom_gbm():
             return [l[0] + r[0], l[1] + r[1]]
 
         def metric(self, l):
+            import java.lang.Math as math
             return np.sqrt(l[0] / l[1])
 
     # Upload the custom metric
