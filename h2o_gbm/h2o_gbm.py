@@ -56,7 +56,8 @@ print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predicti
 # Define asymmetric loss distribution from Gaussian distribution
 class AsymmetricLossDistribution(CustomDistributionGaussian):
     def gradient(self, y, f):
-        error = (y - f) ** 2
+        import ipdb; ipdb.set_trace()
+        error = (y - f)
         return error if error < 0 else 2 * error
 
 # upload distribution to h2o
@@ -149,15 +150,6 @@ gbm_custom_mm = H2OGradientBoostingEstimator(
     distribution="gaussian",
     custom_metric_func=custom_mm_func,
 )
-
-# gbm_custom_mm = H2OGradientBoostingEstimator(
-#     model_id="delivery_model",
-#     ntrees=50,
-#     max_depth=5,
-#     score_each_iteration=True,
-#     distribution="gaussian",
-#     custom_metric_func=custom_mm_func,
-# )
 
 import ipdb
 
