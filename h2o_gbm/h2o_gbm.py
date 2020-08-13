@@ -131,7 +131,7 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func
 #     custom_metric_func=custom_mm_func,
 # )
 
-gbm_gaussian = H2OGradientBoostingEstimator(
+gbm_custom_mm = H2OGradientBoostingEstimator(
     model_id="delivery_model",
     ntrees=50,
     max_depth=5,
