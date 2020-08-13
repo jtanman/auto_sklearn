@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import feather
 import h2o
@@ -159,21 +160,23 @@ deliveries, late, early = evaluate(data_val_treated, predictions_custom_mm)
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
-import ipdb; ipdb.set_trace()
 # Train GBM model with custom metric and distribution
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
     ntrees=50,
-    max_depth=5,
+    max_depth=3,
     score_each_iteration=True,
     stopping_metric="custom",
     stopping_tolerance=0.1,
-    stopping_rounds=5,
+    stopping_rounds=10,
     distribution="custom",
     custom_metric_func=custom_mm_func,
     custom_distribution_func=distribution_ref,
+    max_runtime_secs=30*60
 )
 gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
+
+h2o.saveModel(gbm_custom_cmm)
 
 # Predict
 predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
@@ -182,3 +185,5 @@ deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 # Evalute and print summary
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
+
+import ipdb; ipdb.set_trace()
