@@ -24,10 +24,10 @@ def evaluate(test, predictions):
     predictions.loc[predictions.residual > 0, "fit"] = 0
     # if residual is zero or negative there are enough or more items in the store
     predictions.loc[predictions.residual <= 0, "fit"] = 1
-    items = predictions.shape[0]
-    more_or_perfect = sum(predictions.fit)
-    less = items - more_or_perfect
-    return (items, less, more_or_perfect)
+    deliveries = predictions.shape[0]
+    early = sum(predictions.fit)
+    late = items - more_or_perfect
+    return (deliveries, late, early)
 
 data_train_treated = feather.read_dataframe('./data_train_treated.feather')
 data_val_treated = feather.read_dataframe('./data_val_treated.feather')
@@ -48,9 +48,9 @@ gbm_gaussian.train(y="delivery", x=ind_vars, training_frame=train_h2o)
 
 # Predict
 predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
-items, less, more_or_perfect = evaluate(data_val_treated, predictions)
+deliveries, late, early = evaluate(data_val_treated, predictions)
 
-print(items, less, more_or_perfect)
+print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.predict)}')
 
@@ -88,10 +88,10 @@ gbm_custom.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
 
 # Predict
 predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
-items, less, more_or_perfect = evaluate(data_val_treated, predictions_custom)
+deliveries, late, early = evaluate(data_val_treated, predictions_custom)
 
 # Evalute and print summary
-print(items, less, more_or_perfect)
+print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
 
