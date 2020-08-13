@@ -30,11 +30,12 @@ def evaluate(test, predictions):
     late = deliveries - early
     return (deliveries, late, early)
 
+
 data_train_treated = feather.read_dataframe('./data_train_treated.feather')
 data_val_treated = feather.read_dataframe('./data_val_treated.feather')
-data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')    
+data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')
 
-data_train_treated = data_train_treated.sample(n=10000, axis=0)
+# data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
 ind_vars = list(data_train_treated.columns)
 ind_vars.remove('delivery')
@@ -43,24 +44,25 @@ train_h2o = h2o.H2OFrame(data_train_treated)
 test_h2o = h2o.H2OFrame(data_val_treated)
 pred_h2o = h2o.H2OFrame(data_pred_treated)
 
-gbm_gaussian = H2OGradientBoostingEstimator(
-    model_id="delivery_model", ntrees=50, max_depth=5, score_each_iteration=True, distribution="gaussian"
-)
+# gbm_gaussian = H2OGradientBoostingEstimator(
+#     model_id="delivery_model", ntrees=50, max_depth=5, score_each_iteration=True, distribution="gaussian"
+# )
 
-gbm_gaussian.train(y="delivery", x=ind_vars, training_frame=train_h2o)
+# gbm_gaussian.train(y="delivery", x=ind_vars, training_frame=train_h2o)
 
-# Predict
-predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
-deliveries, late, early = evaluate(data_val_treated, predictions)
+# # Predict
+# predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
+# deliveries, late, early = evaluate(data_val_treated, predictions)
 
-print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
-print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
+# print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
+# print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
 
 # Define asymmetric loss distribution from Gaussian distribution
 class AsymmetricLossDistribution(CustomDistributionGaussian):
     def gradient(self, y, f):
-        error = (y - f)
+        error = y - f
         return error if error < 0 else 2 * error
+
 
 # upload distribution to h2o
 name = "asymmetric"
@@ -77,30 +79,30 @@ except (IOError):
 
     sys.exit()
 
-gbm_custom = H2OGradientBoostingEstimator(
-    model_id="custom_delivery_model",
-    ntrees=50,
-    max_depth=5,
-    score_each_iteration=True,
-    distribution="custom",
-    custom_distribution_func=distribution_ref,
-)
+# gbm_custom = H2OGradientBoostingEstimator(
+#     model_id="custom_delivery_model",
+#     ntrees=50,
+#     max_depth=5,
+#     score_each_iteration=True,
+#     distribution="custom",
+#     custom_distribution_func=distribution_ref,
+# )
 
-gbm_custom.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
+# gbm_custom.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
 
-# Predict
-predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
-deliveries, late, early = evaluate(data_val_treated, predictions_custom)
+# # Predict
+# predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
+# deliveries, late, early = evaluate(data_val_treated, predictions_custom)
 
-# Evalute and print summary
-print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
-print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
+# # Evalute and print summary
+# print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
+# print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
 
-print("original vs. custom")
-print("prediction mean:", predictions.predict.mean(), predictions_custom.predict.mean())
-print("prediction variance:", predictions.predict.var(), predictions_custom.predict.var())
-print("residual mean:", predictions.sresidual.mean(), predictions_custom.sresidual.mean())
-print("residual variance:", predictions.sresidual.var(), predictions_custom.sresidual.var())
+# print("original vs. custom")
+# print("prediction mean:", predictions.predict.mean(), predictions_custom.predict.mean())
+# print("prediction variance:", predictions.predict.var(), predictions_custom.predict.var())
+# print("residual mean:", predictions.sresidual.mean(), predictions_custom.sresidual.mean())
+# print("residual variance:", predictions.sresidual.var(), predictions_custom.sresidual.var())
 
 # Custom asymmetric metric
 
@@ -140,27 +142,27 @@ class CustomRmseFunc:
 # Upload the custom metric
 custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func_file="mm_rmse.py")
 
-# Train GBM model with custom metric
-gbm_custom_mm = H2OGradientBoostingEstimator(
-    model_id="custom_delivery_model_mm",
-    ntrees=50,
-    max_depth=5,
-    score_each_iteration=True,
-    stopping_metric="custom",
-    stopping_tolerance=0.1,
-    stopping_rounds=5,
-    distribution="gaussian",
-    custom_metric_func=custom_mm_func,
-)
-gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
+# # Train GBM model with custom metric
+# gbm_custom_mm = H2OGradientBoostingEstimator(
+#     model_id="custom_delivery_model_mm",
+#     ntrees=50,
+#     max_depth=5,
+#     score_each_iteration=True,
+#     stopping_metric="custom",
+#     stopping_tolerance=0.1,
+#     stopping_rounds=5,
+#     distribution="gaussian",
+#     custom_metric_func=custom_mm_func,
+# )
+# gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
-# Predict
-predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
-deliveries, late, early = evaluate(data_val_treated, predictions_custom_mm)
+# # Predict
+# predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
+# deliveries, late, early = evaluate(data_val_treated, predictions_custom_mm)
 
-# Evalute and print summary
-print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
-print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
+# # Evalute and print summary
+# print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
+# print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
 # Train GBM model with custom metric and distribution
 gbm_custom_cmm = H2OGradientBoostingEstimator(
@@ -174,7 +176,7 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
     distribution="custom",
     custom_metric_func=custom_mm_func,
     custom_distribution_func=distribution_ref,
-    max_runtime_secs=30*60
+    max_runtime_secs=30 * 60,
 )
 gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
@@ -188,13 +190,7 @@ deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
 
-
-
-import ipdb; ipdb.set_trace()
-
 predictions_pred = gbm_custom_cmm.predict(test_data=pred_h2o).as_data_frame()
-
-
-pd.DataFrame({'prediction': gbm_custom_cmm.predict(pred_h2o)}).to_csv(
-        f'data_to_predict_{time.strftime("%Y%m%d-%H%M%S")}.csv'
-    )
+pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
+    f'data_to_predict_h20{time.strftime("%Y%m%d-%H%M%S")}.csv'
+)
