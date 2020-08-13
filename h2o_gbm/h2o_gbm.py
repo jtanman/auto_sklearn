@@ -9,8 +9,6 @@ from h2o.utils.distributions import CustomDistributionGaussian
 
 from auto_sk.auto_sk import rmse_weighted
 
-
-
 h2o.init()
 
 data_train_treated = feather.read_dataframe('./data_train_treated.feather')
