@@ -32,6 +32,7 @@ def evaluate(test, predictions):
 
 data_train_treated = feather.read_dataframe('./data_train_treated.feather')
 data_val_treated = feather.read_dataframe('./data_val_treated.feather')
+data_pred_treated = feather.read_dataframe('./data_pred_treated.feather')    
 
 data_train_treated = data_train_treated.sample(n=10000, axis=0)
 
@@ -40,6 +41,7 @@ ind_vars.remove('delivery')
 
 train_h2o = h2o.H2OFrame(data_train_treated)
 test_h2o = h2o.H2OFrame(data_val_treated)
+pred_h2o = h2o.H2OFrame(data_pred_treated)
 
 gbm_gaussian = H2OGradientBoostingEstimator(
     model_id="delivery_model", ntrees=50, max_depth=5, score_each_iteration=True, distribution="gaussian"
@@ -186,4 +188,13 @@ deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
 
+
+
 import ipdb; ipdb.set_trace()
+
+predictions_pred = gbm_custom_cmm.predict(test_data=pred_h2o).as_data_frame()
+
+
+pd.DataFrame({'prediction': gbm_custom_cmm.predict(pred_h2o)}).to_csv(
+        f'data_to_predict_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+    )
