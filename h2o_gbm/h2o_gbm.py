@@ -84,7 +84,23 @@ def train_custom_gbm():
 
     # Custom asymmetric metric
 
-    class CustomAsymmetricMseFunc:
+    # class CustomAsymmetricMseFunc:
+    #     def map(self, pred, act, w, o, model):
+    #         error = act[0] - pred[0]
+    #         error = error if error < 0 else 2 * error
+    #         return [error * error, 1]
+
+    #     def reduce(self, l, r):
+    #         return [l[0] + r[0], l[1] + r[1]]
+
+    #     def metric(self, l):
+    #         import java.lang.Math as math
+    #         return np.sqrt(l[0] / l[1])
+
+    # # Upload the custom metric
+    # metric_ref = h2o.upload_custom_metric(CustomAsymmetricMseFunc, func_name="custom_mse", func_file="custom_mse.py")
+
+    class CustomRmseFunc:
         def map(self, pred, act, w, o, model):
             error = act[0] - pred[0]
             error = error if error < 0 else 2 * error
@@ -94,11 +110,14 @@ def train_custom_gbm():
             return [l[0] + r[0], l[1] + r[1]]
 
         def metric(self, l):
+            # Use Java API directly
             import java.lang.Math as math
-            return np.sqrt(l[0] / l[1])
+            return math.sqrt(l[0] / l[1])
 
     # Upload the custom metric
-    metric_ref = h2o.upload_custom_metric(CustomAsymmetricMseFunc, func_name="custom_mse", func_file="custom_mse.py")
+    custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc,
+                                            func_name="rmse",
+                                            func_file="mm_rmse.py")
 
     # Train GBM model with custom metric
     gbm_custom_mm = H2OGradientBoostingEstimator(
@@ -110,7 +129,7 @@ def train_custom_gbm():
         stopping_tolerance=0.1,
         stopping_rounds=5,
         distribution="gaussian",
-        custom_metric_func=metric_ref,
+        custom_metric_func=custom_mm_func,
     )
 
     import ipdb; ipdb.set_trace()
