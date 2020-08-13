@@ -52,12 +52,11 @@ deliveries, late, early = evaluate(data_val_treated, predictions)
 
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
-print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.predict)}')
 
 # Define asymmetric loss distribution from Gaussian distribution
 class AsymmetricLossDistribution(CustomDistributionGaussian):
     def gradient(self, y, f):
-        error = y - f
+        error = (y - f) ** 2
         return error if error < 0 else 2 * error
 
 # upload distribution to h2o
@@ -93,7 +92,6 @@ deliveries, late, early = evaluate(data_val_treated, predictions_custom)
 # Evalute and print summary
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
-print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
 
 print("original vs. custom")
 print("prediction mean:", predictions.predict.mean(), predictions_custom.predict.mean())
@@ -140,26 +138,26 @@ class CustomRmseFunc:
 custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func_file="mm_rmse.py")
 
 # Train GBM model with custom metric
-# gbm_custom_mm = H2OGradientBoostingEstimator(
-#     model_id="custom_delivery_model_mm",
-#     ntrees=50,
-#     max_depth=5,
-#     score_each_iteration=True,
-#     stopping_metric="custom",
-#     stopping_tolerance=0.1,
-#     stopping_rounds=5,
-#     distribution="gaussian",
-#     custom_metric_func=custom_mm_func,
-# )
-
 gbm_custom_mm = H2OGradientBoostingEstimator(
-    model_id="delivery_model",
+    model_id="custom_delivery_model_mm",
     ntrees=50,
     max_depth=5,
     score_each_iteration=True,
+    stopping_metric="custom",
+    stopping_tolerance=0.1,
+    stopping_rounds=5,
     distribution="gaussian",
     custom_metric_func=custom_mm_func,
 )
+
+# gbm_custom_mm = H2OGradientBoostingEstimator(
+#     model_id="delivery_model",
+#     ntrees=50,
+#     max_depth=5,
+#     score_each_iteration=True,
+#     distribution="gaussian",
+#     custom_metric_func=custom_mm_func,
+# )
 
 import ipdb
 
@@ -168,28 +166,30 @@ gbm_custom_mm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validati
 
 # Predict
 predictions_custom_mm = gbm_custom_mm.predict(test_data=test_h2o).as_data_frame()
+deliveries, late, early = evaluate(data_val_treated, predictions_custom_mm)
 
 # Evalute and print summary
+print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
-print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_mm.predict)}')
 
-# # Train GBM model with custom metric and distribution
-# gbm_custom_cmm = H2OGradientBoostingEstimator(
-#     model_id="custom_delivery_model_cmm",
-#     ntrees=50,
-#     max_depth=5,
-#     score_each_iteration=True,
-#     stopping_metric="custom",
-#     stopping_tolerance=0.1,
-#     stopping_rounds=5,
-#     distribution="custom",
-#     custom_metric_func=metric_ref,
-#     custom_distribution_func=distribution_ref,
-# )
+# Train GBM model with custom metric and distribution
+gbm_custom_cmm = H2OGradientBoostingEstimator(
+    model_id="custom_delivery_model_cmm",
+    ntrees=50,
+    max_depth=5,
+    score_each_iteration=True,
+    stopping_metric="custom",
+    stopping_tolerance=0.1,
+    stopping_rounds=5,
+    distribution="custom",
+    custom_metric_func=metric_ref,
+    custom_distribution_func=distribution_ref,
+)
 
-# # Predict
-# predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
+# Predict
+predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
+deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 
-# # Evalute and print summary
-# print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
-# print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom_cmm.predict)}')
+# Evalute and print summary
+print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
+print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
