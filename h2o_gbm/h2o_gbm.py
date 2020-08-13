@@ -18,7 +18,7 @@ def evaluate(test, predictions):
     predictions["actual"] = test.delivery.values
     predictions.columns = ["predict", "actual"]
     predictions["residual"] = predictions.actual - predictions.predict
-    predictions["sresidual"] = predictions.residual / np.sqrt(predict.actual)
+    predictions["sresidual"] = predictions.residual / np.sqrt(predictions.actual)
     predictions["fit"] = 0
     # if residual is positive there are not enough items in the store
     predictions.loc[predictions.residual > 0, "fit"] = 0
