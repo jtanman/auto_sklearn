@@ -176,7 +176,7 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
 )
 gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
-h2o.saveModel(gbm_custom_cmm)
+h2o.save_model(gbm_custom_cmm)
 
 # Predict
 predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
