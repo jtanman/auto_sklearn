@@ -182,7 +182,7 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
     stopping_tolerance=0.1,
     stopping_rounds=5,
     distribution="custom",
-    custom_metric_func=metric_ref,
+    custom_metric_func=custom_mm_func,
     custom_distribution_func=distribution_ref,
 )
 
