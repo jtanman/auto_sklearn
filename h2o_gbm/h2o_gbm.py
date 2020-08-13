@@ -110,6 +110,7 @@ def train_custom_gbm():
         custom_metric_func=metric_ref,
     )
 
+    import ipdb; ipdb.set_trace()
     gbm_custom_mm.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
 
     # Predict
