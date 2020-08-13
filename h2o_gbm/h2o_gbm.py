@@ -15,12 +15,8 @@ h2o.init()
 # evaluate number of good predictions
 def evaluate(test, predictions):
 
-    import ipdb; ipdb.set_trace()
     predictions["actual"] = test.delivery.values
     predictions.columns = ["prediction", "actual"]
-    predictions["date"] = test.date.values
-    predictions["item"] = test.item.values
-    predictions["store"] = test.store.values
     predictions["residual"] = predictions.actual - predictions.prediction
     predictions["sresidual"] = predictions.residual / np.sqrt(predictions.actual)
     predictions["fit"] = 0
@@ -52,11 +48,9 @@ gbm_gaussian.train(y="delivery", x=ind_vars, training_frame=train_h2o)
 
 # Predict
 predictions = gbm_gaussian.predict(test_data=test_h2o).as_data_frame()
+items, less, more_or_perfect = evaluate(data_val_treated, predictions)
 
-import ipdb; ipdb.set_trace()
-
-items, less, more_or_perfect = evaluate(test, predictions)
-
+print(items, less, more_or_perfect)
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions.predict)}')
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions.predict)}')
 
@@ -94,8 +88,10 @@ gbm_custom.train(y="delivery", x=train_h2o.names, training_frame=train_h2o)
 
 # Predict
 predictions_custom = gbm_custom.predict(test_data=test_h2o).as_data_frame()
+items, less, more_or_perfect = evaluate(data_val_treated, predictions_custom)
 
 # Evalute and print summary
+print(items, less, more_or_perfect)
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom.predict)}')
 print(f'Proportion Late: {np.mean(data_val_treated.delivery.values > predictions_custom.predict)}')
 
