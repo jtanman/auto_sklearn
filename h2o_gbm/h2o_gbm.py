@@ -142,7 +142,7 @@ class CustomRmseFunc:
 
 
 # Upload the custom metric
-custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func_file="mm_rmse.py")
+custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse_weighted", func_file="mm_rmse.py")
 
 # # Train GBM model with custom metric
 # gbm_custom_mm = H2OGradientBoostingEstimator(
@@ -189,7 +189,7 @@ gbm_params2 = {'learn_rate': [i * 0.01 for i in range(1, 11)],
                 'col_sample_rate': [i * 0.1 for i in range(1, 11)]}
 
 # Search criteria
-search_criteria = {'strategy': 'RandomDiscrete', 'max_models': 36, 'seed': 1}
+search_criteria = {'strategy': 'RandomDiscrete', 'max_models': 12, 'seed': 1}
 
 # Train and validate a random grid of GBMs
 gbm_grid2 = H2OGridSearch(model=gbm_custom_cmm,
@@ -221,3 +221,5 @@ predictions_pred = best_gbm2.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
     f'data_to_predict_h20_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )
+
+h2o.cluster().shutdown(prompt=True)
