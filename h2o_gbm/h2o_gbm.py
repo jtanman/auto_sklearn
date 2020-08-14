@@ -298,7 +298,7 @@ gbm_params = {
 }
 
 # Search criteria
-search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs': 8 * 60 * 60}
+search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs':  5 * 60}
 
 # Train and validate a random grid of GBMs
 gbm_grid = H2OGridSearch(
@@ -309,15 +309,16 @@ gbm_grid = H2OGridSearch(
 
 gbm_grid.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
-import ipdb
-
-ipdb.set_trace()
-
 grid_id = gbm_grid.grid_id
 old_grid_model_count = len(gbm_grid.model_ids)
 
 # Save the grid
 saved_path = h2o.save_grid('./gbm_grid_second', grid_id)
+
+
+import ipdb
+
+ipdb.set_trace()
 
 gbm_gridperf = gbm_grid.get_grid(sort_by='rmse', decreasing=False)
 best_gbm = gbm_gridperf.models[0]
