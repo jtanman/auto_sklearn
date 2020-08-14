@@ -9,11 +9,24 @@ import pandas as pd
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.utils.distributions import CustomDistributionGaussian
 from h2o.grid.grid_search import H2OGridSearch
+from h2o.estimators.stackedensemble import H2OStackedEnsembleEstimator
 
 from auto_sk.auto_sk import rmse_weighted
 
 
 h2o.init()
+
+def grid_to_df(grid):
+    
+    table = []
+        for model in grid.models:
+            model_summary = model._model_json["output"]["model_summary"]
+            r_values = list(model_summary.cell_values[0])
+            r_values[0] = model.model_id
+            table.append(r_values)
+
+    return table
+
 
 # evaluate number of good predictions
 def evaluate(test, predictions):
@@ -128,8 +141,8 @@ except (IOError):
 class CustomRmseFunc:
     def map(self, pred, act, w, o, model):
         error = act[0] - pred[0]
-        error = error if error < 0 else 2 * error
-        return [error * error, 1]
+        error = error ** 2 if error < 0 else 2 * (error ** 2)
+        return [error, 1]
 
     def reduce(self, l, r):
         return [l[0] + r[0], l[1] + r[1]]
@@ -166,13 +179,16 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse_weight
 # print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 # print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
-import ipdb
+import ipdb; ipdb.set_trace()
 
-ipdb.set_trace()
+grid = h2o.load_grid('./gbm_grid_first/' + "" + grid_id)
+
+
+nfolds = 5
 
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
-    ntrees=10000,
+    ntrees=1000,
     score_each_iteration=True,
     stopping_metric="custom",
     stopping_tolerance=0.1,
@@ -181,13 +197,16 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
     custom_metric_func=custom_mm_func,
     custom_distribution_func=distribution_ref,
     max_runtime_secs=30 * 60,
+    nfolds=nfolds,
+    fold_assignment='Modulo',
+    keep_cross_validation_predictions=True
 )
 
 
 # GBM hyperparameters
 gbm_params2 = {
-    'learn_rate': [i * 0.01 for i in range(1, 11)],
-    'max_depth': list(range(1, 11)),
+    'learn_rate': [i * 0.01 for i in range(1, 30)],
+    'max_depth': list(range(1, 20)),
     'sample_rate': [i * 0.1 for i in range(5, 11)],
     'col_sample_rate': [i * 0.1 for i in range(1, 11)],
 }
@@ -219,12 +238,21 @@ predictions_custom_cmm = best_gbm2.predict(test_data=test_h2o).as_data_frame()
 deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 
 # Evalute and print summary
+rmse_val = rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
-print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
+print(f'RMSE Weighted: {rmse_val}')
+
+# Train a stacked ensemble using the GBM grid
+ensemble = H2OStackedEnsembleEstimator(model_id="my_ensemble_gbm_grid", base_models=gbm_grid2.model_ids)
+ensemble.train(x=ind_vars, y='delivery', training_frame=train_h2o, validation_frame=test_h2o)
+
+# Predict
+predictions_custom_cmm = best_gbm2.predict(test_data=test_h2o).as_data_frame()
+deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 
 predictions_pred = best_gbm2.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
-    f'data_to_predict_h2o_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+    f'data_to_predict_h2o_{rmse_val}_{late/deliveries}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )
 
 h2o.cluster().shutdown(prompt=True)
