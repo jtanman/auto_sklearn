@@ -1,6 +1,7 @@
 import datetime
 import time
 import os
+import itertools
 
 import feather
 import h2o
@@ -10,22 +11,113 @@ from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.utils.distributions import CustomDistributionGaussian
 from h2o.grid.grid_search import H2OGridSearch
 from h2o.estimators.stackedensemble import H2OStackedEnsembleEstimator
+from h2o.model.metrics_base import show as model_show
 
 from auto_sk.auto_sk import rmse_weighted
 
 
 h2o.init()
 
-def grid_to_df(grid):
+def grid_to_summary(grid):
 
     table = []
     for model in grid.models:
         model_summary = model._model_json["output"]["model_summary"]
         r_values = list(model_summary.cell_values[0])
         r_values[0] = model.model_id
+
+        model_metrics = model._model_json['output']['validation_metrics']
+        if model_metrics._metric_json==None:
+            print("WARNING: Model metrics cannot be calculated and metric_json is empty due to the absence of the response column in your dataset.")
+            return
+        metric_type = model_metrics._metric_json['__meta']['schema_type']
+        types_w_glm = ['ModelMetricsRegressionGLM', 'ModelMetricsRegressionGLMGeneric', 'ModelMetricsBinomialGLM',
+                       'ModelMetricsBinomialGLMGeneric', 'ModelMetricsHGLMGaussianGaussian', 
+                       'ModelMetricsHGLMGaussianGaussianGeneric']
+        types_w_clustering = ['ModelMetricsClustering']
+        types_w_mult = ['ModelMetricsMultinomial', 'ModelMetricsMultinomialGeneric']
+        types_w_ord = ['ModelMetricsOrdinal', 'ModelMetricsOrdinalGeneric']
+        types_w_bin = ['ModelMetricsBinomial', 'ModelMetricsBinomialGeneric', 'ModelMetricsBinomialGLM', 'ModelMetricsBinomialGLMGeneric']
+        types_w_r2 = ['ModelMetricsRegressionGLM', 'ModelMetricsRegressionGLMGeneric']
+        types_w_mean_residual_deviance = ['ModelMetricsRegressionGLM', 'ModelMetricsRegressionGLMGeneric',
+                                          'ModelMetricsRegression', 'ModelMetricsRegressionGeneric']
+        types_w_mean_absolute_error = ['ModelMetricsRegressionGLM', 'ModelMetricsRegressionGLMGeneric',
+                                       'ModelMetricsRegression', 'ModelMetricsRegressionGeneric']
+        types_w_logloss = types_w_bin + types_w_mult+types_w_ord
+        types_w_dim = ["ModelMetricsGLRM"]
+        types_w_anomaly = ['ModelMetricsAnomaly']
+        
+        if metric_type not in types_w_anomaly:
+            r_values.append(model_metrics.mse())
+            r_values.append(model_metrics.rmse())
+        if metric_type in types_w_mean_absolute_error:
+            r_values.append(model_metrics.mae())
+            r_values.append(model_metrics.rmsle())
+        if metric_type in types_w_r2:
+            r_values.append(model_metrics.r2())
+        if metric_type in types_w_mean_residual_deviance:
+            r_values.append(model_metrics.mean_residual_deviance())
+        if model_metrics.custom_metric_name():
+            r_values.append(model_metrics.custom_metric_value())
+
         table.append(r_values)
 
-    return table
+    keys = ['model_ids'] + model_summary.col_header[1:]
+    if metric_type not in types_w_anomaly:
+        keys.extend(['mse', 'rmse'])
+    if metric_type in types_w_mean_absolute_error:
+        keys.extend(['mae', 'rmsle'])
+    if metric_type in types_w_r2:
+        keys.append('r2')
+    if metric_type in types_w_mean_residual_deviance:
+        keys.append('mean_residual_deviance')
+    if model_metrics.custom_metric_name():
+        keys.append(model_metrics.custom_metric_name())
+
+    df = pd.DataFrame(table, columns=keys)
+    
+    return(df)
+
+
+def grid_to_params(grid):
+    """Print models sorted by metric.
+
+    :examples:
+
+    >>> from h2o.estimators import H2ODeepLearningEstimator
+    >>> from h2o.grid.grid_search import H2OGridSearch
+    >>> insurance = h2o.import_file("http://s3.amazonaws.com/h2o-public-test-data/smalldata/glm_test/insurance.csv")
+    >>> insurance["offset"] = insurance["Holders"].log()
+    >>> insurance["Group"] = insurance["Group"].asfactor()
+    >>> insurance["Age"] = insurance["Age"].asfactor()
+    >>> insurance["District"] = insurance["District"].asfactor()
+    >>> hyper_params = {'huber_alpha': [0.2,0.5],
+    ...                 'quantile_alpha': [0.2,0.6]}
+    >>> from h2o.estimators import H2ODeepLearningEstimator
+    >>> gs = H2OGridSearch(H2ODeepLearningEstimator(epochs=5),
+    ...                    hyper_params)
+    >>> gs.train(x=list(range(3)),y="Claims", training_frame=insurance)
+    >>> gs.show()
+    """
+    hyper_combos = itertools.product(*list(grid.hyper_params.values()))
+    if not grid.models:
+        c_values = [[idx + 1, list(val)] for idx, val in enumerate(hyper_combos)]
+        print(H2OTwoDimTable(
+            col_header=['Model', 'Hyperparameters: [' + ', '.join(list(grid.hyper_params.keys())) + ']'],
+            table_header='Grid Search of Model ' + grid.model.__class__.__name__, cell_values=c_values))
+    else:
+        return(pd.DataFrame(grid.sorted_metric_table()))
+
+def grid_to_df(grid, sort_by=None, ascending=True):
+
+    df_params = grid_to_show(grid)
+    df_summary = grid_to_summary(grid)
+
+    df_ret = pd.concat([df_params, df_summary], axis=1)
+    df_ret = df_ret.loc[:,~df_ret.columns.duplicated()]
+    if sort_by is not None:
+        df_ret.sort_values(sort_by, ascending)
+    return df_ret
 
 
 # evaluate number of good predictions
@@ -179,11 +271,6 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse_weight
 # print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 # print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
-import ipdb; ipdb.set_trace()
-
-grid = h2o.load_grid('./gbm_grid_first/' + "" + grid_id)
-
-
 nfolds = 5
 
 gbm_custom_cmm = H2OGradientBoostingEstimator(
@@ -204,7 +291,7 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
 
 
 # GBM hyperparameters
-gbm_params2 = {
+gbm_params = {
     'learn_rate': [i * 0.01 for i in range(1, 30)],
     'max_depth': list(range(1, 20)),
     'sample_rate': [i * 0.1 for i in range(5, 11)],
@@ -215,26 +302,26 @@ gbm_params2 = {
 search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs': 4 * 60 * 60}
 
 # Train and validate a random grid of GBMs
-gbm_grid2 = H2OGridSearch(
-    model=gbm_custom_cmm, grid_id='gbm_grid2', hyper_params=gbm_params2, search_criteria=search_criteria
+gbm_grid = H2OGridSearch(
+    model=gbm_custom_cmm, grid_id='gbm_grid', hyper_params=gbm_params, search_criteria=search_criteria
 )
 
 # Train GBM model with custom metric and distribution
 
-gbm_grid2.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
+gbm_grid.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
 import ipdb
 
 ipdb.set_trace()
 
-gbm_gridperf2 = gbm_grid2.get_grid(sort_by='rmse', decreasing=False)
-best_gbm2 = gbm_gridperf2.models[0]
+gbm_gridperf = gbm_grid.get_grid(sort_by='rmse', decreasing=False)
+best_gbm = gbm_gridperf.models[0]
 
-model_path = h2o.save_model(best_gbm2, force=True)
+model_path = h2o.save_model(best_gbm, force=True)
 os.rename(model_path, model_path + '_' + time.strftime("%Y%m%d-%H%M%S"))
 
 # Predict
-predictions_custom_cmm = best_gbm2.predict(test_data=test_h2o).as_data_frame()
+predictions_custom_cmm = best_gbm.predict(test_data=test_h2o).as_data_frame()
 deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 
 # Evalute and print summary
@@ -243,14 +330,14 @@ print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_val}')
 
 # Train a stacked ensemble using the GBM grid
-ensemble = H2OStackedEnsembleEstimator(model_id="my_ensemble_gbm_grid", base_models=gbm_grid2.model_ids)
+ensemble = H2OStackedEnsembleEstimator(model_id="my_ensemble_gbm_grid", base_models=gbm_grid.model_ids)
 ensemble.train(x=ind_vars, y='delivery', training_frame=train_h2o, validation_frame=test_h2o)
 
 # Predict
-predictions_custom_cmm = best_gbm2.predict(test_data=test_h2o).as_data_frame()
+predictions_custom_cmm = best_gbm.predict(test_data=test_h2o).as_data_frame()
 deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 
-predictions_pred = best_gbm2.predict(test_data=pred_h2o).as_data_frame()
+predictions_pred = best_gbm.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
     f'data_to_predict_h2o_{rmse_val}_{late/deliveries}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )

@@ -143,4 +143,4 @@ cython_debug/
 *.feather
 autosklearn_regression_example_tmp/
 autosklearn_regression_example_out/
-
+*.json
