@@ -166,11 +166,13 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse_weight
 # print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 # print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
-import ipdb; ipdb.set_trace()
+import ipdb
+
+ipdb.set_trace()
 
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
-    ntrees=100,
+    ntrees=10000,
     score_each_iteration=True,
     stopping_metric="custom",
     stopping_tolerance=0.1,
@@ -183,25 +185,28 @@ gbm_custom_cmm = H2OGradientBoostingEstimator(
 
 
 # GBM hyperparameters
-gbm_params2 = {'learn_rate': [i * 0.01 for i in range(1, 11)],
-                'max_depth': list(range(1, 11)),
-                'sample_rate': [i * 0.1 for i in range(5, 11)],
-                'col_sample_rate': [i * 0.1 for i in range(1, 11)]}
+gbm_params2 = {
+    'learn_rate': [i * 0.01 for i in range(1, 11)],
+    'max_depth': list(range(1, 11)),
+    'sample_rate': [i * 0.1 for i in range(5, 11)],
+    'col_sample_rate': [i * 0.1 for i in range(1, 11)],
+}
 
 # Search criteria
-search_criteria = {'strategy': 'RandomDiscrete', 'max_models': 12, 'seed': 1}
+search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs': 4 * 60 * 60}
 
 # Train and validate a random grid of GBMs
-gbm_grid2 = H2OGridSearch(model=gbm_custom_cmm,
-                          grid_id='gbm_grid2',
-                          hyper_params=gbm_params2,
-                          search_criteria=search_criteria)
+gbm_grid2 = H2OGridSearch(
+    model=gbm_custom_cmm, grid_id='gbm_grid2', hyper_params=gbm_params2, search_criteria=search_criteria
+)
 
 # Train GBM model with custom metric and distribution
 
 gbm_grid2.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
-import ipdb; ipdb.set_trace()
+import ipdb
+
+ipdb.set_trace()
 
 gbm_gridperf2 = gbm_grid2.get_grid(sort_by='rmse', decreasing=False)
 best_gbm2 = gbm_gridperf2.models[0]
@@ -219,7 +224,7 @@ print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predicti
 
 predictions_pred = best_gbm2.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
-    f'data_to_predict_h20_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+    f'data_to_predict_h2o_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )
 
 h2o.cluster().shutdown(prompt=True)
