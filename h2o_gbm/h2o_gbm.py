@@ -199,18 +199,23 @@ gbm_grid2 = H2OGridSearch(model=gbm_custom_cmm,
 
 gbm_grid2.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
-model_path = h2o.save_model(gbm_custom_cmm, force=True)
+import ipdb; ipdb.set_trace()
+
+gbm_gridperf2 = gbm_grid2.get_grid(sort_by='rmse', decreasing=False)
+best_gbm2 = gbm_gridperf2.models[0]
+
+model_path = h2o.save_model(best_gbm2, force=True)
 os.rename(model_path, model_path + '_' + time.strftime("%Y%m%d-%H%M%S"))
 
 # Predict
-predictions_custom_cmm = gbm_custom_cmm.predict(test_data=test_h2o).as_data_frame()
+predictions_custom_cmm = best_gbm2.predict(test_data=test_h2o).as_data_frame()
 deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
 
 # Evalute and print summary
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_cmm.predict)}')
 
-predictions_pred = gbm_custom_cmm.predict(test_data=pred_h2o).as_data_frame()
+predictions_pred = best_gbm2.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
     f'data_to_predict_h20_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )
