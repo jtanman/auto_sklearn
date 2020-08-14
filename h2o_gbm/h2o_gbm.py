@@ -270,7 +270,7 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse_weight
 # print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 # print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
-nfolds = 5
+nfolds = 3
 
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
@@ -298,7 +298,7 @@ gbm_params = {
 }
 
 # Search criteria
-search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs':  5 * 60}
+search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs':  8 * 60 * 60}
 
 # Train and validate a random grid of GBMs
 gbm_grid = H2OGridSearch(
