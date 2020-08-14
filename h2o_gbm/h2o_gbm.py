@@ -320,6 +320,9 @@ import ipdb
 
 ipdb.set_trace()
 
+df = grid_to_df(grid)
+df.to_csv(f'grid_{time.strftime("%Y%m%d-%H%M%S")}.csv')
+
 gbm_gridperf = gbm_grid.get_grid(sort_by='rmse', decreasing=False)
 best_gbm = gbm_gridperf.models[0]
 
