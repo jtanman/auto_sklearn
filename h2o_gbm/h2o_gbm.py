@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.utils.distributions import CustomDistributionGaussian
+from h2o.grid.grid_search
 
 from auto_sk.auto_sk import rmse_weighted
 
@@ -165,21 +166,38 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func
 # print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 # print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
-# Train GBM model with custom metric and distribution
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
-    ntrees=20000,
-    max_depth=3,
+    n.trees=100,
     score_each_iteration=True,
     stopping_metric="custom",
-    # stopping_tolerance=0.1,
-    # stopping_rounds=10,
+    stopping_tolerance=0.1,
+    stopping_rounds=10,
     distribution="custom",
     custom_metric_func=custom_mm_func,
     custom_distribution_func=distribution_ref,
     max_runtime_secs=30 * 60,
 )
-gbm_custom_cmm.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
+
+
+# GBM hyperparameters
+gbm_params2 = {'learn_rate': [i * 0.01 for i in range(1, 11)],
+                'max_depth': list(range(1, 11)),
+                'sample_rate': [i * 0.1 for i in range(5, 11)],
+                'col_sample_rate': [i * 0.1 for i in range(1, 11)]}
+
+# Search criteria
+search_criteria = {'strategy': 'RandomDiscrete', 'max_models': 36, 'seed': 1}
+
+# Train and validate a random grid of GBMs
+gbm_grid2 = H2OGridSearch(model=gbm_custom_cmm,
+                          grid_id='gbm_grid2',
+                          hyper_params=gbm_params2,
+                          search_criteria=search_criteria)
+
+# Train GBM model with custom metric and distribution
+
+gbm_grid2.train(y="delivery", x=ind_vars, training_frame=train_h2o, validation_frame=test_h2o)
 
 model_path = h2o.save_model(gbm_custom_cmm, force=True)
 os.rename(model_path, model_path + '_' + time.strftime("%Y%m%d-%H%M%S"))
