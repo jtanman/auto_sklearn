@@ -314,6 +314,12 @@ import ipdb
 
 ipdb.set_trace()
 
+grid_id = gbm_grid.grid_id
+old_grid_model_count = len(gbm_grid.model_ids)
+
+# Save the grid
+saved_path = h2o.save_grid('./gbm_grid_second', grid_id)
+
 gbm_gridperf = gbm_grid.get_grid(sort_by='rmse', decreasing=False)
 best_gbm = gbm_gridperf.models[0]
 
