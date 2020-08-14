@@ -109,7 +109,7 @@ def grid_to_params(grid):
 
 def grid_to_df(grid, sort_by=None, ascending=True):
 
-    df_params = grid_to_show(grid)
+    df_params = grid_to_params(grid)
     df_summary = grid_to_summary(grid)
 
     df_ret = pd.concat([df_params, df_summary], axis=1)
@@ -320,7 +320,7 @@ import ipdb
 
 ipdb.set_trace()
 
-df = grid_to_df(grid)
+df = grid_to_df(gbm_grid)
 df.to_csv(f'grid_{time.strftime("%Y%m%d-%H%M%S")}.csv')
 
 gbm_gridperf = gbm_grid.get_grid(sort_by='rmse', decreasing=False)
