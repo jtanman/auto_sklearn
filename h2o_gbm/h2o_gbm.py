@@ -11,7 +11,6 @@ from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.utils.distributions import CustomDistributionGaussian
 from h2o.grid.grid_search import H2OGridSearch
 from h2o.estimators.stackedensemble import H2OStackedEnsembleEstimator
-from h2o.model.metrics_base import show as model_show
 
 from auto_sk.auto_sk import rmse_weighted
 
