@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from h2o.estimators.gbm import H2OGradientBoostingEstimator
 from h2o.utils.distributions import CustomDistributionGaussian
-from h2o.grid.grid_search
+from h2o.grid.grid_search import H2OGridSearch
 
 from auto_sk.auto_sk import rmse_weighted
 
