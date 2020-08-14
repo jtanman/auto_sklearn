@@ -166,6 +166,8 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func
 # print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 # print(f'RMSE Weighted: {rmse_weighted(data_val_treated.delivery.values, predictions_custom_mm.predict)}')
 
+import ipdb; ipdb.set_trace()
+
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
     ntrees=100,
