@@ -168,7 +168,7 @@ custom_mm_func = h2o.upload_custom_metric(CustomRmseFunc, func_name="rmse", func
 
 gbm_custom_cmm = H2OGradientBoostingEstimator(
     model_id="custom_delivery_model_cmm",
-    n.trees=100,
+    ntrees=100,
     score_each_iteration=True,
     stopping_metric="custom",
     stopping_tolerance=0.1,
