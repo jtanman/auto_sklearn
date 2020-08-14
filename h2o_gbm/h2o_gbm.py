@@ -335,15 +335,30 @@ rmse_val = rmse_weighted(data_val_treated.delivery.values, predictions_custom_cm
 print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
 print(f'RMSE Weighted: {rmse_val}')
 
+# Predict
+
+predictions_pred = best_gbm.predict(test_data=pred_h2o).as_data_frame()
+pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
+    f'data_to_predict_h2o_{rmse_val}_{late/deliveries}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+)
+
 # Train a stacked ensemble using the GBM grid
 ensemble = H2OStackedEnsembleEstimator(model_id="my_ensemble_gbm_grid", base_models=gbm_grid.model_ids)
 ensemble.train(x=ind_vars, y='delivery', training_frame=train_h2o, validation_frame=test_h2o)
 
-# Predict
-predictions_custom_cmm = best_gbm.predict(test_data=test_h2o).as_data_frame()
-deliveries, late, early = evaluate(data_val_treated, predictions_custom_cmm)
+# evaluate stacked ensemble model
+perf_stack_test = ensemble.model_performance(test_h2o)
+predictions_ensemble = ensemble.predict(test_data=test_h2o).as_data_frame()
+deliveries, late, early = evaluate(data_val_treated, predictions_ensemble)
 
-predictions_pred = best_gbm.predict(test_data=pred_h2o).as_data_frame()
+rmse_val = rmse_weighted(data_val_treated.delivery.values, predictions_ensemble.predict)
+print(f'Deliveries: {deliveries}, % Late: {late/deliveries}')
+print(f'RMSE Weighted: {rmse_val}')
+
+model_path = h2o.save_model(ensemble, force=True)
+os.rename(model_path, f'{model_path}_{rmse_val}_{late/deliveries}_{time.strftime("%Y%m%d-%H%M%S")}')
+
+predictions_pred = ensemble.predict(test_data=pred_h2o).as_data_frame()
 pd.DataFrame({'prediction': predictions_pred.predict}).to_csv(
     f'data_to_predict_h2o_{rmse_val}_{late/deliveries}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
 )
