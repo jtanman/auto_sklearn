@@ -17,13 +17,13 @@ from auto_sk.auto_sk import rmse_weighted
 h2o.init()
 
 def grid_to_df(grid):
-    
+
     table = []
-        for model in grid.models:
-            model_summary = model._model_json["output"]["model_summary"]
-            r_values = list(model_summary.cell_values[0])
-            r_values[0] = model.model_id
-            table.append(r_values)
+    for model in grid.models:
+        model_summary = model._model_json["output"]["model_summary"]
+        r_values = list(model_summary.cell_values[0])
+        r_values[0] = model.model_id
+        table.append(r_values)
 
     return table
 
