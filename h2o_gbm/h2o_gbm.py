@@ -298,7 +298,7 @@ gbm_params = {
 }
 
 # Search criteria
-search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs':  8 * 60 * 60}
+search_criteria = {'strategy': 'RandomDiscrete', 'seed': 1, 'max_runtime_secs':  7 * 60 * 60}
 
 # Train and validate a random grid of GBMs
 gbm_grid = H2OGridSearch(
